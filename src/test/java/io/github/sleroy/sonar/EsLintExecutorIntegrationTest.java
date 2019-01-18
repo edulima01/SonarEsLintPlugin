@@ -26,33 +26,32 @@ import static org.mockito.Mockito.when;
 @RunWith(value = MockitoJUnitRunner.class)
 public class EsLintExecutorIntegrationTest {
 
-    @Mock
-    System2 system;
+	@Mock
+	System2 system;
 
-    @Mock
-    TempFolder tempFolder;
+	@Mock
+	TempFolder tempFolder;
 
-    @Ignore("ESLint Integration debug test")
-    @Test
-    public void testEsLint() throws IOException {
+	@Ignore("ESLint Integration debug test")
+	@Test
+	public void testEsLint() throws IOException {
 
-        EsLintExecutorConfig esLintConfiguration = new EsLintExecutorConfig();
-        esLintConfiguration.setConfigFile("src\\test\\resources\\.eslintrc.js");
-        esLintConfiguration.setPathToEsLint("C:\\Users\\Administrator\\AppData\\Roaming\\npm\\node_modules\\eslint\\bin\\eslint.js");
-        esLintConfiguration.setTimeoutMs(40000);
+		EsLintExecutorConfig esLintConfiguration = new EsLintExecutorConfig();
+		esLintConfiguration.setConfigFile("src\\test\\resources\\.eslintrc.js");
+		esLintConfiguration.setPathToEsLint(
+				"C:\\Users\\Administrator\\AppData\\Roaming\\npm\\node_modules\\eslint\\bin\\eslint.js");
+		esLintConfiguration.setTimeoutMs(40000);
 
+		when(tempFolder.newFile()).thenReturn(File.createTempFile("eslintexecutor", ".json"));
 
-        when(tempFolder.newFile()).thenReturn(File.createTempFile("eslintexecutor", ".json"));
+		EsLintExecutor esLintExecutor = new EsLintExecutorImpl(system, tempFolder);
 
-        EsLintExecutor esLintExecutor = new EsLintExecutorImpl(system, tempFolder);
+		List<String> files = new ArrayList<>();
+		files.add(new File("src/test/resources/dashboard.js").getAbsolutePath());
 
-        List<String> files = new ArrayList<>();
-        files.add(new File("src/test/resources/dashboard.js").getAbsolutePath());
-
-        List<String> commandOutput = esLintExecutor.execute(esLintConfiguration, files);
-        assertNotNull(commandOutput);
-        assertEquals("Expected number of results", 1, commandOutput.size());
-    }
-
+		List<String> commandOutput = esLintExecutor.execute(esLintConfiguration, files);
+		assertNotNull(commandOutput);
+		assertEquals("Expected number of results", 1, commandOutput.size());
+	}
 
 }

@@ -14,43 +14,33 @@
 	<inceptionYear>2013</inceptionYear>
 	<url>https://github.com/sleroy/SonarTsPlugin</url>
 
-	<organisation>
+	<organization>
 		<name>Sylvain Leroy, Paul O'Neill (pablissimo) and contributors</name>
 		<url>https://github.com/sleroy/SonarEsLintPlugin</url>
-	</organisation>
+	</organization>
 
 	<developers>
 		<developer>
-			<id>pablissimo</id>
-			<name>Paul O'Neill</name>
-			<url>http://pablissimo.com</url>
-		</developer>
-		<developer>
-			<id>sleroy</id>
-			<name>Sylvain Leroy</name>
-			<url>http://www.sylvainleroy.fr</url>
+			<id>edulima</id>
+			<name>Eduardo Lima</name>
 		</developer>
 	</developers>
 
 	<scm>
-		<connection>scm:git:git@github.com:sleroy/SonarEsLintPlugin.git</connection>
-		<developerConnection>scm:git:git@github.com:sleroy/SonarEsLintPlugin.git</developerConnection>
-		<url>https://github.com/sleroy/SonarTsPlugin</url>
+		<connection>scm:git:git@github.com:edulima01/SonarEsLintPlugin.git</connection>
+		<developerConnection>scm:git:git@github.com:edulima01/SonarEsLintPlugin.git</developerConnection>
+		<url>https://github.com/edulima01/SonarTsPlugin</url>
 		<tag>1.0</tag>
 	</scm>
 	<issueManagement>
 		<system>Github</system>
-		<url>https://github.com/sleroy/SonarTsPlugin/issues</url>
+		<url>https://github.com/edulima/SonarEsLintPlugin/issues</url>
 	</issueManagement>
-	<ciManagement>
-		<system>Travis</system>
-		<url>https://travis-ci.org/sleroy/SonarEsLintPlugin</url>
-	</ciManagement>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<sonar.buildVersion>6.7.3</sonar.buildVersion>
+		<sonar.buildVersion>7.5</sonar.buildVersion>
 		<jdk.min.version>1.8</jdk.min.version>
 		<sslr.version>1.22</sslr.version>
 	</properties>
@@ -136,7 +126,7 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>2.17.0</version>
+			<version>2.22.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -150,7 +140,6 @@
 				</includes>
 			</testResource>
 		</testResources>
-
 		<plugins>
 			<plugin>
 				<groupId>org.sonarsource.sonar-packaging-maven-plugin</groupId>
@@ -176,20 +165,6 @@
 						<arg>-Werror</arg>
 					</compilerArgs>
 				</configuration>
-			</plugin>
-			<plugin>
-				<!-- UTF-8 bundles are not supported by Java, so they must be converted 
-					during build -->
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>native2ascii-maven-plugin</artifactId>
-				<version>1.0-beta-1</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>native2ascii</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.eluder.coveralls</groupId>
@@ -227,10 +202,25 @@
 						</fileSet>
 					</fileSets>
 				</configuration>
-
 			</plugin>
-
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<!-- UTF-8 bundles are not supported by Java, so they must be converted 
+						during build -->
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>native2ascii-maven-plugin</artifactId>
+					<version>1.0-beta-1</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>native2ascii</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
-
 </project>

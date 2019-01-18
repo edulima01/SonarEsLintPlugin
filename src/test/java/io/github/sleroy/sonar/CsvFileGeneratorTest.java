@@ -17,50 +17,44 @@ import java.util.List;
 import static org.apache.commons.lang3.StringUtils.removeStart;
 
 /**
- * Created by Administrator on 31.01.2017.
- * Utility class to generate some configuration informations
+ * Created by Administrator on 31.01.2017. Utility class to generate some
+ * configuration informations
  */
 public class CsvFileGeneratorTest {
 
-    @Ignore
-    @Test
-    public void test() {
-        try (BufferedReader fr = new BufferedReader(new FileReader(new File("C:\\rules.csv")))) {
-            List<String> lines = new ArrayList<>();
-            List<String> keys = new ArrayList<>();
-            String str;
+	@Ignore
+	@Test
+	public void test() {
+		try (BufferedReader fr = new BufferedReader(new FileReader(new File("C:\\rules.csv")))) {
+			List<String> lines = new ArrayList<>();
+			List<String> keys = new ArrayList<>();
+			String str;
 
+			while ((str = fr.readLine()) != null) {
+				System.out.println(str);
+				String[] strings = str.split(";");
+				String key = clean(strings[0]);
+				String message = clean(strings[1]);
+				lines.add(MessageFormat.format("{0}=true", key));
+				lines.add(MessageFormat.format("{0}.name={1}", key, message));
+				lines.add(MessageFormat.format("{0}.severity=MINOR", key));
+				lines.add(MessageFormat.format("{0}.debtFunc=CONSTANT_ISSUE", key));
+				lines.add(MessageFormat.format("{0}.debtScalar=1min", key));
+				lines.add("");
+				keys.add("\"" + key + "\"");
 
-            while ((str = fr.readLine()) != null) {
-                System.out.println(str);
-                String[] strings = str.split(";");
-                String key = clean(strings[0]);
-                String message = clean(strings[1]);
-                lines.add(MessageFormat.format("{0}=true", key));
-                lines.add(MessageFormat.format("{0}.name={1}", key, message));
-                lines.add(MessageFormat.format("{0}.severity=MINOR", key));
-                lines.add(MessageFormat.format("{0}.debtFunc=CONSTANT_ISSUE", key));
-                lines.add(MessageFormat.format("{0}.debtScalar=1min", key));
-                lines.add("");
-                keys.add("\"" + key + "\"");
+			}
+			FileUtils.writeLines(new File("src\\main\\resources\\rules.properties"), lines);
+			System.out.println(keys);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-
-            }
-            FileUtils.writeLines(new File("src\\main\\resources\\rules.properties"), lines);
-            System.out.println(keys);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String clean(String string) {
-        return StringUtils.removeEnd(
-                removeStart(
-                        StringUtils.replace(string, "�", " ")
-                        , "\"")
-                , "\"").trim();
-    }
+	private String clean(String string) {
+		return StringUtils.removeEnd(removeStart(StringUtils.replace(string, "�", " "), "\""), "\"").trim();
+	}
 
 }

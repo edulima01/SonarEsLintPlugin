@@ -17,5 +17,5 @@ import io.github.sleroy.sonar.EsLintExecutorConfig;
 
 @ScannerSide
 public interface EsLintExecutor {
-    List<String> execute(EsLintExecutorConfig config, List<String> files);
+	List<String> execute(EsLintExecutorConfig config, List<String> files);
 }

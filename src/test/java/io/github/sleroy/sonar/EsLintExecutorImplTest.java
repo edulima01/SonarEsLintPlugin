@@ -35,147 +35,147 @@ import org.sonar.api.utils.command.CommandExecutor;
 import org.sonar.api.utils.command.StreamConsumer;
 
 public class EsLintExecutorImplTest {
-    EsLintExecutorImpl executorImpl;
-    CommandExecutor    commandExecutor;
-    TempFolder	       tempFolder;
-    File	       tempOutputFile;
+	EsLintExecutorImpl executorImpl;
+	CommandExecutor commandExecutor;
+	TempFolder tempFolder;
+	File tempOutputFile;
 
-    System2 system;
+	System2 system;
 
-    EsLintExecutorConfig config;
+	EsLintExecutorConfig config;
 
-    @Test
-    public void BatchesExecutions_IfTooManyFilesForCommandLine() {
-	final List<String> filenames = new ArrayList<>();
-	int currentLength = 0;
-	final int standardCmdLength = "node path/to/eslint --rules-dir path/to/rules --out path/to/temp --config path/to/config"
-		.length();
+	@Test
+	public void BatchesExecutions_IfTooManyFilesForCommandLine() {
+		final List<String> filenames = new ArrayList<>();
+		int currentLength = 0;
+		final int standardCmdLength = "node path/to/eslint --rules-dir path/to/rules --out path/to/temp --config path/to/config"
+				.length();
 
-	final String firstBatch = "first batch";
-	while (currentLength + 12 < EsLintExecutorImpl.MAX_COMMAND_LENGTH - standardCmdLength) {
-	    filenames.add(firstBatch);
-	    currentLength += firstBatch.length() + 1; // 1 for the space
+		final String firstBatch = "first batch";
+		while (currentLength + 12 < EsLintExecutorImpl.MAX_COMMAND_LENGTH - standardCmdLength) {
+			filenames.add(firstBatch);
+			currentLength += firstBatch.length() + 1; // 1 for the space
+		}
+		filenames.add("second batch");
+
+		final ArrayList<Command> capturedCommands = new ArrayList<>();
+		final ArrayList<Long> capturedTimeouts = new ArrayList<>();
+
+		final Answer<Integer> captureCommand = invocation -> {
+			capturedCommands.add((Command) invocation.getArguments()[0]);
+			capturedTimeouts.add((long) invocation.getArguments()[3]);
+			return 0;
+		};
+
+		when(commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class),
+				any(long.class))).then(captureCommand);
+		executorImpl.execute(config, filenames);
+
+		assertEquals(2, capturedCommands.size());
+
 	}
-	filenames.add("second batch");
 
-	final ArrayList<Command> capturedCommands = new ArrayList<>();
-	final ArrayList<Long> capturedTimeouts = new ArrayList<>();
+	@Test
+	public void DoesNotAddRulesDirParameter_IfEmptyString() {
+		final ArrayList<Command> capturedCommands = new ArrayList<>();
+		final ArrayList<Long> capturedTimeouts = new ArrayList<>();
 
-	final Answer<Integer> captureCommand = invocation -> {
-	    capturedCommands.add((Command) invocation.getArguments()[0]);
-	    capturedTimeouts.add((long) invocation.getArguments()[3]);
-	    return 0;
-	};
+		final Answer<Integer> captureCommand = invocation -> {
+			capturedCommands.add((Command) invocation.getArguments()[0]);
+			capturedTimeouts.add((long) invocation.getArguments()[3]);
+			return 0;
+		};
 
-	when(commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class),
-		any(long.class))).then(captureCommand);
-	executorImpl.execute(config, filenames);
+		when(commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class),
+				any(long.class))).then(captureCommand);
 
-	assertEquals(2, capturedCommands.size());
+		config.setRulesDir("");
+		executorImpl.execute(config, Arrays.asList(new String[] { "path/to/file" }));
 
-    }
+		final Command theCommand = capturedCommands.get(0);
+		assertFalse(theCommand.toCommandLine().contains("--rules-dir"));
+	}
 
-    @Test
-    public void DoesNotAddRulesDirParameter_IfEmptyString() {
-	final ArrayList<Command> capturedCommands = new ArrayList<>();
-	final ArrayList<Long> capturedTimeouts = new ArrayList<>();
+	@Test
+	public void DoesNotAddRulesDirParameter_IfNull() {
+		final ArrayList<Command> capturedCommands = new ArrayList<>();
+		final ArrayList<Long> capturedTimeouts = new ArrayList<>();
 
-	final Answer<Integer> captureCommand = invocation -> {
-	    capturedCommands.add((Command) invocation.getArguments()[0]);
-	    capturedTimeouts.add((long) invocation.getArguments()[3]);
-	    return 0;
-	};
+		final Answer<Integer> captureCommand = invocation -> {
+			capturedCommands.add((Command) invocation.getArguments()[0]);
+			capturedTimeouts.add((long) invocation.getArguments()[3]);
+			return 0;
+		};
 
-	when(commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class),
-		any(long.class))).then(captureCommand);
+		when(commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class),
+				any(long.class))).then(captureCommand);
 
-	config.setRulesDir("");
-	executorImpl.execute(config, Arrays.asList(new String[] { "path/to/file" }));
+		config.setRulesDir(null);
+		executorImpl.execute(config, Arrays.asList(new String[] { "path/to/file" }));
 
-	final Command theCommand = capturedCommands.get(0);
-	assertFalse(theCommand.toCommandLine().contains("--rules-dir"));
-    }
+		final Command theCommand = capturedCommands.get(0);
+		assertFalse(theCommand.toCommandLine().contains("--rules-dir"));
+	}
 
-    @Test
-    public void DoesNotAddRulesDirParameter_IfNull() {
-	final ArrayList<Command> capturedCommands = new ArrayList<>();
-	final ArrayList<Long> capturedTimeouts = new ArrayList<>();
+	@Test(expected = IllegalArgumentException.class)
+	public void execute_throws_ifNullConfigSupplied() {
+		executorImpl.execute(null, new ArrayList<String>());
+	}
 
-	final Answer<Integer> captureCommand = invocation -> {
-	    capturedCommands.add((Command) invocation.getArguments()[0]);
-	    capturedTimeouts.add((long) invocation.getArguments()[3]);
-	    return 0;
-	};
+	@Test(expected = IllegalArgumentException.class)
+	public void execute_throws_ifNullFileListSupplied() {
+		executorImpl.execute(config, null);
+	}
 
-	when(commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class),
-		any(long.class))).then(captureCommand);
+	@Test
+	public void executesCommandWithCorrectArgumentsAndTimeouts() {
+		final ArrayList<Command> capturedCommands = new ArrayList<>();
+		final ArrayList<Long> capturedTimeouts = new ArrayList<>();
 
-	config.setRulesDir(null);
-	executorImpl.execute(config, Arrays.asList(new String[] { "path/to/file" }));
+		final Answer<Integer> captureCommand = invocation -> {
+			capturedCommands.add((Command) invocation.getArguments()[0]);
+			capturedTimeouts.add((long) invocation.getArguments()[3]);
+			return 0;
+		};
 
-	final Command theCommand = capturedCommands.get(0);
-	assertFalse(theCommand.toCommandLine().contains("--rules-dir"));
-    }
+		when(commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class),
+				any(long.class))).then(captureCommand);
+		executorImpl.execute(config, Arrays.asList(new String[] { "path/to/file", "path/to/another" }));
 
-    @Test(expected = IllegalArgumentException.class)
-    public void execute_throws_ifNullConfigSupplied() {
-	executorImpl.execute(null, new ArrayList<String>());
-    }
+		assertEquals(1, capturedCommands.size());
 
-    @Test(expected = IllegalArgumentException.class)
-    public void execute_throws_ifNullFileListSupplied() {
-	executorImpl.execute(config, null);
-    }
+		final Command theCommand = capturedCommands.get(0);
+		final long theTimeout = capturedTimeouts.get(0);
 
-    @Test
-    public void executesCommandWithCorrectArgumentsAndTimeouts() {
-	final ArrayList<Command> capturedCommands = new ArrayList<>();
-	final ArrayList<Long> capturedTimeouts = new ArrayList<>();
+		assertEquals(
+				"node path/to/eslint -f json --rules-dir path/to/rules --output-file path/to/temp --config path/to/config path/to/file path/to/another",
+				theCommand.toCommandLine());
+		// Expect one timeout period per file processed
+		assertEquals(2 * 40000, theTimeout);
+	}
 
-	final Answer<Integer> captureCommand = invocation -> {
-	    capturedCommands.add((Command) invocation.getArguments()[0]);
-	    capturedTimeouts.add((long) invocation.getArguments()[3]);
-	    return 0;
-	};
+	@Before
+	public void setUp() throws Exception {
+		system = mock(System2.class);
+		when(system.isOsWindows()).thenReturn(SystemUtils.IS_OS_WINDOWS);
 
-	when(commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class),
-		any(long.class))).then(captureCommand);
-	executorImpl.execute(config, Arrays.asList(new String[] { "path/to/file", "path/to/another" }));
+		tempFolder = mock(TempFolder.class);
 
-	assertEquals(1, capturedCommands.size());
+		tempOutputFile = mock(File.class);
+		when(tempOutputFile.getAbsolutePath()).thenReturn("path/to/temp");
+		when(tempFolder.newFile()).thenReturn(tempOutputFile);
 
-	final Command theCommand = capturedCommands.get(0);
-	final long theTimeout = capturedTimeouts.get(0);
+		commandExecutor = mock(CommandExecutor.class);
 
-	assertEquals(
-		"node path/to/eslint -f json --rules-dir path/to/rules --output-file path/to/temp --config path/to/config path/to/file path/to/another",
-		theCommand.toCommandLine());
-	// Expect one timeout period per file processed
-	assertEquals(2 * 40000, theTimeout);
-    }
+		executorImpl = spy(new EsLintExecutorImpl(system, tempFolder));
+		when(executorImpl.createExecutor()).thenReturn(commandExecutor);
+		doReturn(mock(BufferedReader.class)).when(executorImpl).getBufferedReaderForFile(any(File.class));
 
-    @Before
-    public void setUp() throws Exception {
-	system = mock(System2.class);
-	when(system.isOsWindows()).thenReturn(SystemUtils.IS_OS_WINDOWS);
-
-	tempFolder = mock(TempFolder.class);
-
-	tempOutputFile = mock(File.class);
-	when(tempOutputFile.getAbsolutePath()).thenReturn("path/to/temp");
-	when(tempFolder.newFile()).thenReturn(tempOutputFile);
-
-	commandExecutor = mock(CommandExecutor.class);
-
-	executorImpl = spy(new EsLintExecutorImpl(system, tempFolder));
-	when(executorImpl.createExecutor()).thenReturn(commandExecutor);
-	doReturn(mock(BufferedReader.class)).when(executorImpl).getBufferedReaderForFile(any(File.class));
-
-	// Setup a default config, which each method will mutate as required
-	config = new EsLintExecutorConfig();
-	config.setPathToEsLint("path/to/eslint");
-	config.setConfigFile("path/to/config");
-	config.setRulesDir("path/to/rules");
-	config.setTimeoutMs(40000);
-    }
+		// Setup a default config, which each method will mutate as required
+		config = new EsLintExecutorConfig();
+		config.setPathToEsLint("path/to/eslint");
+		config.setConfigFile("path/to/config");
+		config.setRulesDir("path/to/rules");
+		config.setTimeoutMs(40000);
+	}
 }

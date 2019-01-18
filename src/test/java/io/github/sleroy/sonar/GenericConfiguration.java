@@ -9,59 +9,57 @@
  */
 package io.github.sleroy.sonar;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.sonar.api.config.Configuration;
-import org.sonar.api.config.Settings;
-import org.sonar.api.config.internal.ConfigurationBridge;
-import org.sonar.api.config.internal.MapSettings;
 
 public class GenericConfiguration implements Configuration {
 
-    private final Settings	      settings		  = new MapSettings();
-    private final ConfigurationBridge configurationBridge = new ConfigurationBridge(settings);
+	@SuppressWarnings("rawtypes")
+	private final Map settings = new HashMap();
 
-    @Override
-    public Optional<String> get(String key) { // TODO Auto-generated method stub
-	return configurationBridge.get(key);
-    }
+	@Override
+	public Optional<String> get(String key) {
+		if (settings.containsKey(key)) {
+			return Optional.of(settings.get(key).toString());
+		}
+		return Optional.empty();
+	}
 
-    @Override
-    public String[] getStringArray(String key) {
+	@Override
+	public String[] getStringArray(String key) {
+		if (settings.containsKey(key)) {
+			return new String[] { settings.get(key).toString() };
+		}
+		return new String[0];
+	}
 
-	return configurationBridge.getStringArray(key);
-    }
+	@Override
+	public boolean hasKey(String key) {
+		return settings.containsKey(key);
+	}
 
-    @Override
-    public boolean hasKey(String key) {
+	/**
+	 * Sets the property.
+	 *
+	 * @param key    the key
+	 * @param _value the value
+	 */
+	@SuppressWarnings("unchecked")
+	public void setProperty(String key, int _value) {
+		settings.put(key, _value);
+	}
 
-	return configurationBridge.hasKey(key);
-    }
-
-    /**
-     * Sets the property.
-     *
-     * @param key
-     *            the key
-     * @param _value
-     *            the value
-     */
-    public void setProperty(String key, int _value) {
-	settings.setProperty(key, _value);
-
-    }
-
-    /**
-     * Sets the property.
-     *
-     * @param key
-     *            the key
-     * @param _value
-     *            the value
-     */
-    public void setProperty(String key, String _value) {
-	settings.setProperty(key, _value);
-
-    }
-
+	/**
+	 * Sets the property.
+	 *
+	 * @param key    the key
+	 * @param _value the value
+	 */
+	@SuppressWarnings("unchecked")
+	public void setProperty(String key, String _value) {
+		settings.put(key, _value);
+	}
 }

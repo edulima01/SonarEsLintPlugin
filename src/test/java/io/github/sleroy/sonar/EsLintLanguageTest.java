@@ -13,16 +13,16 @@ import org.junit.After;
 import org.junit.Before;
 
 public class EsLintLanguageTest {
-    EsLintLanguage language;
+	EsLintLanguage language;
 
-    @Before
-    public void setUp() throws Exception {
-	language = new EsLintLanguage();
-    }
+	@Before
+	public void setUp() throws Exception {
+		language = new EsLintLanguage();
+	}
 
-    @After
-    public void tearDown() throws Exception {
-	//
-    }
+	@After
+	public void tearDown() throws Exception {
+		//
+	}
 
 }

@@ -10,36 +10,24 @@
  */
 package io.github.sleroy.sonar;
 
-import org.sonar.api.profiles.ProfileDefinition;
-import org.sonar.api.profiles.RulesProfile;
-import org.sonar.api.rules.Rule;
-import org.sonar.api.utils.ValidationMessages;
+import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition;
 
 import io.github.sleroy.sonar.model.EsLintRule;
 
-/**
- * This class defines the iinformations required to create a default rule
- * profile for EsLint.
- */
-public class EsLintRuleProfile extends ProfileDefinition {
-    public static final String PROFILE_NAME = "eslint";
+public class EsLintRuleProfile implements BuiltInQualityProfilesDefinition {
+	public static final String PROFILE_NAME = "EsLint";
+	@Override
+	public void define(Context context) {
+		final NewBuiltInQualityProfile profile = context.createBuiltInQualityProfile(EsLintRuleProfile.PROFILE_NAME, EsLintLanguage.LANGUAGE_KEY);
+		
+		final EsRulesDefinition rules = new EsRulesDefinition();
+		
+		profile.activateRule(EsRulesDefinition.REPOSITORY_NAME, EsRulesDefinition.ESLINT_UNKNOWN_RULE.getKey());
 
-    private static void activateRule(final RulesProfile profile, final String ruleKey) {
-	profile.activateRule(Rule.create(EsRulesDefinition.REPOSITORY_NAME, ruleKey), null);
-    }
+		for (final EsLintRule coreRule : rules.getCoreRules()) {
+			profile.activateRule(EsRulesDefinition.REPOSITORY_NAME, coreRule.getKey());
+		}
 
-    @Override
-    public RulesProfile createProfile(final ValidationMessages validation) {
-	final RulesProfile profile = RulesProfile.create("EsLint", EsLintLanguage.LANGUAGE_KEY);
-
-	final EsRulesDefinition rules = new EsRulesDefinition();
-
-	EsLintRuleProfile.activateRule(profile, EsRulesDefinition.ESLINT_UNKNOWN_RULE.getKey());
-
-	for (final EsLintRule coreRule : rules.getCoreRules()) {
-	    EsLintRuleProfile.activateRule(profile, coreRule.getKey());
+		profile.done();
 	}
-
-	return profile;
-    }
 }

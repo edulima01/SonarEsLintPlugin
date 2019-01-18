@@ -25,30 +25,30 @@ import org.sonar.api.batch.sensor.SensorContext;
 import io.github.sleroy.sonar.api.PathResolver;
 
 public class EsLintExecutorConfigFactoryTest {
-    @Test
-    public <T> void fromSettings_checkConfigurationOrder() {
-	final GenericConfiguration settings = new GenericConfiguration();
+	@Test
+	public <T> void fromSettings_checkConfigurationOrder() {
+		final GenericConfiguration settings = new GenericConfiguration();
 
-	final FileSystem fileSystemMock = mock(FileSystem.class);
-	final SensorContext sensorContextMock = mock(SensorContext.class);
-	when(sensorContextMock.fileSystem()).thenReturn(fileSystemMock);
-	when(fileSystemMock.baseDir()).thenReturn(Files.currentFolder());
-	when(sensorContextMock.config()).thenReturn(settings);
-	final PathResolver pathResolver = spy(new PathResolverImpl());
+		final FileSystem fileSystemMock = mock(FileSystem.class);
+		final SensorContext sensorContextMock = mock(SensorContext.class);
+		when(sensorContextMock.fileSystem()).thenReturn(fileSystemMock);
+		when(fileSystemMock.baseDir()).thenReturn(Files.currentFolder());
+		when(sensorContextMock.config()).thenReturn(settings);
+		final PathResolver pathResolver = spy(new PathResolverImpl());
 
-	final EsLintExecutorConfig config = EsLintExecutorConfigFactory.fromSettings(sensorContextMock, pathResolver);
-	assertNotEquals("No local Eslint file", EsLintExecutorConfig.CONFIG_JS_FILENAME, config.getConfigFile());
+		final EsLintExecutorConfig config = EsLintExecutorConfigFactory.fromSettings(sensorContextMock, pathResolver);
+		assertNotEquals("No local Eslint file", EsLintExecutorConfig.CONFIG_JS_FILENAME, config.getConfigFile());
 
-	verify(pathResolver, atLeastOnce()).getPathFromSetting(sensorContextMock,
-		EsLintPlugin.SETTING_ES_LINT_CONFIG_PATH);
-	verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock, EsLintExecutorConfig.CONFIG_FILENAME);
-	verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock, EsLintExecutorConfig.CONFIG_JS_FILENAME);
-	verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock,
-		EsLintExecutorConfig.CONFIG_JSON_FILENAME);
-	verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock,
-		EsLintExecutorConfig.CONFIG_YAML2_FILENAME);
-	verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock,
-		EsLintExecutorConfig.CONFIG_YAML_FILENAME);
-    }
+		verify(pathResolver, atLeastOnce()).getPathFromSetting(sensorContextMock,
+				EsLintPlugin.SETTING_ES_LINT_CONFIG_PATH);
+		verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock, EsLintExecutorConfig.CONFIG_FILENAME);
+		verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock, EsLintExecutorConfig.CONFIG_JS_FILENAME);
+		verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock,
+				EsLintExecutorConfig.CONFIG_JSON_FILENAME);
+		verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock,
+				EsLintExecutorConfig.CONFIG_YAML2_FILENAME);
+		verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock,
+				EsLintExecutorConfig.CONFIG_YAML_FILENAME);
+	}
 
 }

@@ -34,128 +34,124 @@ import io.github.sleroy.sonar.api.PathResolver;
 
 public class EsLintExecutorConfigTest {
 
-    private static final int TIMEOUT = 12000;
+	private static final int TIMEOUT = 12000;
 
-    @Test
-    public void canGetSetPathToTsLint() {
-	final EsLintExecutorConfig config = getNewConfig();
-	config.setPathToEsLint("My path");
+	@Test
+	public void canGetSetPathToTsLint() {
+		final EsLintExecutorConfig config = getNewConfig();
+		config.setPathToEsLint("My path");
 
-	assertEquals("My path", config.getPathToEsLint());
-    }
+		assertEquals("My path", config.getPathToEsLint());
+	}
 
-    @Test
-    public void canGetSetPathToTsLintConfig() {
-	final EsLintExecutorConfig config = getNewConfig();
-	config.setConfigFile("My path");
+	@Test
+	public void canGetSetPathToTsLintConfig() {
+		final EsLintExecutorConfig config = getNewConfig();
+		config.setConfigFile("My path");
 
-	assertEquals("My path", config.getConfigFile());
-    }
+		assertEquals("My path", config.getConfigFile());
+	}
 
-    @Test
-    public void canGetSetRulesDir() {
-	final EsLintExecutorConfig config = getNewConfig();
-	config.setRulesDir("My path");
+	@Test
+	public void canGetSetRulesDir() {
+		final EsLintExecutorConfig config = getNewConfig();
+		config.setRulesDir("My path");
 
-	assertEquals("My path", config.getRulesDir());
-    }
+		assertEquals("My path", config.getRulesDir());
+	}
 
-    @Test
-    public void canGetSetTimeout() {
-	final EsLintExecutorConfig config = getNewConfig();
-	config.setTimeoutMs(12);
+	@Test
+	public void canGetSetTimeout() {
+		final EsLintExecutorConfig config = getNewConfig();
+		config.setTimeoutMs(12);
 
-	assertEquals((Integer) 12, config.getTimeoutMs());
-    }
+		assertEquals((Integer) 12, config.getTimeoutMs());
+	}
 
-    @Test
-    public <T> void fromSettings_checkConfigurationOrder() {
-	final GenericConfiguration settings = new GenericConfiguration();
+	@Test
+	public <T> void fromSettings_checkConfigurationOrder() {
+		final GenericConfiguration settings = new GenericConfiguration();
 
-	final FileSystem fileSystemMock = mock(FileSystem.class);
-	final SensorContext sensorContextMock = mock(SensorContext.class);
-	when(sensorContextMock.fileSystem()).thenReturn(fileSystemMock);
-	when(fileSystemMock.baseDir()).thenReturn(Files.currentFolder());
-	when(sensorContextMock.config()).thenReturn(settings);
-	final PathResolver pathResolver = spy(new PathResolverImpl());
+		final FileSystem fileSystemMock = mock(FileSystem.class);
+		final SensorContext sensorContextMock = mock(SensorContext.class);
+		when(sensorContextMock.fileSystem()).thenReturn(fileSystemMock);
+		when(fileSystemMock.baseDir()).thenReturn(Files.currentFolder());
+		when(sensorContextMock.config()).thenReturn(settings);
+		final PathResolver pathResolver = spy(new PathResolverImpl());
 
-	final EsLintExecutorConfig config = EsLintExecutorConfigFactory.fromSettings(sensorContextMock, pathResolver);
-	assertNotEquals("No local Eslint file", EsLintExecutorConfig.CONFIG_JS_FILENAME, config.getConfigFile());
+		final EsLintExecutorConfig config = EsLintExecutorConfigFactory.fromSettings(sensorContextMock, pathResolver);
+		assertNotEquals("No local Eslint file", EsLintExecutorConfig.CONFIG_JS_FILENAME, config.getConfigFile());
 
-	verify(pathResolver, atLeastOnce()).getPathFromSetting(sensorContextMock,
-		EsLintPlugin.SETTING_ES_LINT_CONFIG_PATH);
-	verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock, EsLintExecutorConfig.CONFIG_FILENAME);
-	verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock, EsLintExecutorConfig.CONFIG_JS_FILENAME);
-	verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock,
-		EsLintExecutorConfig.CONFIG_JSON_FILENAME);
-	verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock,
-		EsLintExecutorConfig.CONFIG_YAML2_FILENAME);
-	verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock,
-		EsLintExecutorConfig.CONFIG_YAML_FILENAME);
-    }
+		verify(pathResolver, atLeastOnce()).getPathFromSetting(sensorContextMock,
+				EsLintPlugin.SETTING_ES_LINT_CONFIG_PATH);
+		verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock, EsLintExecutorConfig.CONFIG_FILENAME);
+		verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock, EsLintExecutorConfig.CONFIG_JS_FILENAME);
+		verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock,
+				EsLintExecutorConfig.CONFIG_JSON_FILENAME);
+		verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock,
+				EsLintExecutorConfig.CONFIG_YAML2_FILENAME);
+		verify(pathResolver, atLeastOnce()).getAbsolutePath(sensorContextMock,
+				EsLintExecutorConfig.CONFIG_YAML_FILENAME);
+	}
 
-    @Test
-    public void fromSettings_initialisesFromSettingsAndResolver() {
+	@SuppressWarnings("deprecation")
+	@Test
+	public void fromSettings_initialisesFromSettingsAndResolver() {
 
-	final PathResolver resolver = mock(PathResolver.class);
+		final PathResolver resolver = mock(PathResolver.class);
 
-	when(
-		resolver.getPathFromSetting(
-			any(SensorContext.class),
-			eq(EsLintPlugin.SETTING_ES_LINT_PATH),
-			eq(EsLintExecutorConfig.ESLINT_FALLBACK_PATH))).thenReturn(Optional.of("eslint"));
+		when(resolver.getPathFromSetting(any(SensorContext.class), eq(EsLintPlugin.SETTING_ES_LINT_PATH),
+				eq(EsLintExecutorConfig.ESLINT_FALLBACK_PATH))).thenReturn(Optional.of("eslint"));
 
-	when(
-		resolver.getPathFromSetting(
-			any(SensorContext.class),
-			eq(EsLintPlugin.SETTING_ES_LINT_CONFIG_PATH),
-			eq(EsLintExecutorConfig.CONFIG_JS_FILENAME))).thenReturn(Optional.of(".eslintrc.json"));
+		when(resolver.getPathFromSetting(any(SensorContext.class), eq(EsLintPlugin.SETTING_ES_LINT_CONFIG_PATH),
+				eq(EsLintExecutorConfig.CONFIG_JS_FILENAME))).thenReturn(Optional.of(".eslintrc.json"));
 
-	when(resolver.getPathFromSetting(any(SensorContext.class), eq(EsLintPlugin.SETTING_ES_LINT_RULES_DIR),
-		eq(null)))
-			.thenReturn(Optional.of("rulesdir"));
+		when(resolver.getPathFromSetting(any(SensorContext.class), eq(EsLintPlugin.SETTING_ES_LINT_RULES_DIR),
+				eq(null))).thenReturn(Optional.of("rulesdir"));
 
-	final SensorContextTester create = SensorContextTester.create(new File(""));
-	create.settings().setProperty(EsLintPlugin.SETTING_ES_LINT_TIMEOUT, TIMEOUT);
-	final EsLintExecutorConfig config = EsLintExecutorConfigFactory.fromSettings(create, resolver);
+		final SensorContextTester create = SensorContextTester.create(new File(""));
+		create.settings().setProperty(EsLintPlugin.SETTING_ES_LINT_TIMEOUT, TIMEOUT);
+		final EsLintExecutorConfig config = EsLintExecutorConfigFactory.fromSettings(create, resolver);
 
-	assertEquals("eslint", config.getPathToEsLint());
-	assertNull(config.getConfigFile());
-	assertEquals("rulesdir", config.getRulesDir());
+		assertEquals("eslint", config.getPathToEsLint());
+		assertNull(config.getConfigFile());
+		assertEquals("rulesdir", config.getRulesDir());
 
-	assertEquals((Integer) TIMEOUT, config.getTimeoutMs());
-    }
+		assertEquals((Integer) TIMEOUT, config.getTimeoutMs());
+	}
 
-    @Test
-    public void fromSettings_setsTimeoutTo5000msMinimum_ifSetToLess() {
+	@SuppressWarnings("deprecation")
+	@Test
+	public void fromSettings_setsTimeoutTo5000msMinimum_ifSetToLess() {
 
-	final PathResolver resolver = mock(PathResolver.class);
+		final PathResolver resolver = mock(PathResolver.class);
 
-	final SensorContextTester create = SensorContextTester.create(Files.currentFolder());
-	create.settings().setProperty(EsLintPlugin.SETTING_ES_LINT_TIMEOUT, 1000);
-	final EsLintExecutorConfig config = EsLintExecutorConfigFactory.fromSettings(create, resolver);
+		final SensorContextTester create = SensorContextTester.create(Files.currentFolder());
+		create.settings().setProperty(EsLintPlugin.SETTING_ES_LINT_TIMEOUT, 1000);
+		final EsLintExecutorConfig config = EsLintExecutorConfigFactory.fromSettings(create, resolver);
 
-	assertEquals((Integer) EsLintExecutorConfig.MAX_TIMEOUT, config.getTimeoutMs());
-    }
+		assertEquals((Integer) EsLintExecutorConfig.MAX_TIMEOUT, config.getTimeoutMs());
+	}
 
-    @Test
-    public <T> void fromSettings_testDefaultValues() {
+	@SuppressWarnings("deprecation")
+	@Test
+	public <T> void fromSettings_testDefaultValues() {
 
-	mock(FileSystem.class);
-	final SensorContext sensorContextMock = SensorContextTester.create(Files.currentFolder());
-	sensorContextMock.settings().setProperty(EsLintPlugin.SETTING_ES_LINT_TIMEOUT, 12000);
+		mock(FileSystem.class);
+		final SensorContext sensorContextMock = SensorContextTester.create(Files.currentFolder());
+		sensorContextMock.settings().setProperty(EsLintPlugin.SETTING_ES_LINT_TIMEOUT, 12000);
 
-	final PathResolver pathResolver = new PathResolverImpl();
+		final PathResolver pathResolver = new PathResolverImpl();
 
-	final EsLintExecutorConfig config = EsLintExecutorConfigFactory.fromSettings(sensorContextMock, pathResolver);
-	assertNotEquals("Eslint is not installed locally", EsLintExecutorConfig.ESLINT_FALLBACK_PATH,
-		config.getPathToEsLint());
-	assertNotEquals("No local Eslint file", EsLintExecutorConfig.CONFIG_JS_FILENAME, config.getConfigFile());
-	assertNull(config.getRulesDir());
-	assertEquals((Integer) 12000, config.getTimeoutMs());
-    }
+		final EsLintExecutorConfig config = EsLintExecutorConfigFactory.fromSettings(sensorContextMock, pathResolver);
+		assertNotEquals("Eslint is not installed locally", EsLintExecutorConfig.ESLINT_FALLBACK_PATH,
+				config.getPathToEsLint());
+		assertNotEquals("No local Eslint file", EsLintExecutorConfig.CONFIG_JS_FILENAME, config.getConfigFile());
+		assertNull(config.getRulesDir());
+		assertEquals((Integer) 12000, config.getTimeoutMs());
+	}
 
-    private EsLintExecutorConfig getNewConfig() {
-	return new EsLintExecutorConfig();
-    }
+	private EsLintExecutorConfig getNewConfig() {
+		return new EsLintExecutorConfig();
+	}
 }
