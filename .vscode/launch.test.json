@@ -1,0 +1,30 @@
+{
+    "run": {
+        "default": "",
+        "items": [
+            {
+                "name": "sonar-eslint-plugin",
+                "projectName": "sonar-eslint-plugin",
+                "workingDirectory": "c:\\REPOS\\SonarEsLintPlugin",
+                "args": [],
+                "vmargs": [],
+                "env": {},
+                "preLaunchTask": ""
+            }
+        ]
+    },
+    "debug": {
+        "default": "",
+        "items": [
+            {
+                "name": "sonar-eslint-plugin",
+                "projectName": "sonar-eslint-plugin",
+                "workingDirectory": "c:\\REPOS\\SonarEsLintPlugin",
+                "args": [],
+                "vmargs": [],
+                "env": {},
+                "preLaunchTask": ""
+            }
+        ]
+    }
+}

@@ -93,10 +93,10 @@ public class EsLintSensorTest {
 		sensor = spy(new EsLintSensor(settings, resolver, executor, parser));
 
 		file = TestInputFileBuilder.create("", "path/to/file").setLanguage(EsLintLanguage.LANGUAGE_KEY).setLines(1)
-				.setLastValidOffset(999).setOriginalLineStartOffsets(new int[] { 5 }).build();
+				.setLastValidOffset(999).setOriginalLineStartOffsets(new int[] { 5 }).setOriginalLineEndOffsets(new int[]{ 5 }).build();
 
 		typeDefFile = TestInputFileBuilder.create("", "path/to/file.d.ts").setLanguage(EsLintLanguage.LANGUAGE_KEY)
-				.setLines(1).setLastValidOffset(999).setOriginalLineStartOffsets(new int[] { 5 }).build();
+				.setLines(1).setLastValidOffset(999).setOriginalLineStartOffsets(new int[] { 5 }).setOriginalLineEndOffsets(new int[]{ 5 }).build();
 
 		context = SensorContextTester.create(new File(""));
 		context.fileSystem().add(file);
@@ -142,7 +142,7 @@ public class EsLintSensorTest {
 		final EsLintIssue issue = new EsLintIssue();
 		issue.setMessage("failure");
 		issue.setRuleId("rule name");
-		issue.setName(file.absolutePath().replace("\\", "/"));
+		issue.setName(file.uri().toString().replace("\\", "/"));
 
 		issue.setLine(1);
 
@@ -165,7 +165,7 @@ public class EsLintSensorTest {
 		final EsLintIssue issue = new EsLintIssue();
 		issue.setMessage("failure");
 		issue.setRuleId("unknown name");
-		issue.setName(file.absolutePath().replace("\\", "/"));
+		issue.setName(file.uri().toString().replace("\\", "/"));
 
 		issue.setLine(1);
 
@@ -230,7 +230,7 @@ public class EsLintSensorTest {
 	@Test
 	public void execute_doesNotThrow_ifFileIssuesEmpty() {
 		final Map<String, List<EsLintIssue>> issues = new HashMap<>();
-		issues.put(file.absolutePath().replace("\\", "/"), new ArrayList<EsLintIssue>());
+		issues.put(file.uri().toString().replace("\\", "/"), new ArrayList<EsLintIssue>());
 		when(parser.parse(any(List.class))).thenReturn(issues);
 
 		sensor.execute(context);
@@ -240,7 +240,7 @@ public class EsLintSensorTest {
 	@Test
 	public void execute_doesNotThrow_ifFileIssuesNull() {
 		final Map<String, List<EsLintIssue>> issues = new HashMap<>();
-		issues.put(file.absolutePath().replace("\\", "/"), null);
+		issues.put(file.uri().toString().replace("\\", "/"), null);
 		when(parser.parse(any(List.class))).thenReturn(issues);
 
 		sensor.execute(context);
@@ -260,7 +260,7 @@ public class EsLintSensorTest {
 		final EsLintIssue issue = new EsLintIssue();
 		issue.setMessage("failure");
 		issue.setRuleId("rule name");
-		issue.setName(file.absolutePath().replace("\\", "/") + "/nonexistent");
+		issue.setName(file.uri().toString().replace("\\", "/") + "/nonexistent");
 
 		issue.setLine(1);
 
